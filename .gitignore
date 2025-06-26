@@ -1,0 +1,6 @@
+.env
+node_modules
+# Ignore logs
+logs
+# Ignore coverage reports
+*wallet.json
