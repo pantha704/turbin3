@@ -7,5 +7,5 @@ let kp = web3_js_1.Keypair.generate();
 console.log("You've generated a  new Solana wallet: " + kp.publicKey.toBase58());
 // Priv Key as String
 console.log("Your private key is: " + Buffer.from(kp.secretKey).toString('hex'));
-// Raw Priv Key 
+// Priv Key as Raw Uint8Array 
 console.log(kp.secretKey);

@@ -1,4 +1,6 @@
 import { Keypair } from '@solana/web3.js';
+import bs58 from 'bs58';
+import * as prompt from 'prompt-sync';
 
 
 // Generate a new Keypair
