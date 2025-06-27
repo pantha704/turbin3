@@ -30,7 +30,6 @@ const authority_seeds = [
 ];
 const [authority_key, _authority_bump] = PublicKey.findProgramAddressSync(authority_seeds, program.programId);
 
-// const account_key = new PublicKey("8XTgxFg8u3D6bzL7YYMsGtcCSyBHgqbKJkaCAEEKKEoq");
 // INIT
 (async () => {
     try {
