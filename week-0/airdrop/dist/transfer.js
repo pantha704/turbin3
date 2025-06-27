@@ -33,28 +33,3 @@ const connection = new web3_js_1.Connection('https://api.devnet.solana.com');
         console.error('Oops something went wrong: ', error);
     }
 }))();
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const balance = yield connection.getBalance(from.publicKey);
-        const transaction = new web3_js_1.Transaction().add(web3_js_1.SystemProgram.transfer({
-            fromPubkey: from.publicKey,
-            toPubkey: to,
-            lamports: balance
-        }));
-        transaction.recentBlockhash = (yield connection.getLatestBlockhash('confirmed')).blockhash;
-        transaction.feePayer = from.publicKey;
-        const fee = (yield connection.getFeeForMessage(transaction.compileMessage(), 'confirmed')).value || 0;
-        transaction.instructions.pop();
-        transaction.add(web3_js_1.SystemProgram.transfer({
-            fromPubkey: from.publicKey,
-            toPubkey: to,
-            lamports: balance - fee
-        }));
-        const signature = yield (0, web3_js_1.sendAndConfirmTransaction)(connection, transaction, [from]);
-        console.log(`Success! Check out your TX here:
-        https://explorer.solana.com/tx/${signature}?cluster=devnet`);
-    }
-    catch (e) {
-        console.error(`Oops, something went wrong: ${e}`);
-    }
-}))();

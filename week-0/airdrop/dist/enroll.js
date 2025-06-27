@@ -15,35 +15,62 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const web3_js_1 = require("@solana/web3.js");
 const anchor_1 = require("@coral-xyz/anchor");
 const Turbin3_prereq_1 = require("./programs/Turbin3_prereq");
-const dev_wallet_json_1 = __importDefault(require("./dev-wallet.json"));
-// 1. Create a Keypair from your Turbin3 wallet
-const keypair = web3_js_1.Keypair.fromSecretKey(new Uint8Array(dev_wallet_json_1.default));
-// 2. Devnet Connection
-const connection = new web3_js_1.Connection("https://api.devnet.solana.com");
-// 3. Anchor Provider & Program
-const provider = new anchor_1.AnchorProvider(connection, new anchor_1.Wallet(keypair), {
-    commitment: "confirmed",
-});
-const program = new anchor_1.Program(Turbin3_prereq_1.IDL, new web3_js_1.PublicKey("TRBZyQHB3m68FGeVsqTK39Wm4xejadjVhP5MAZaKWDM"), provider);
-// 4. PDA for the program to store your GitHub info
-const [accountKey] = web3_js_1.PublicKey.findProgramAddressSync([Buffer.from("prereqs"), keypair.publicKey.toBuffer()], program.programId);
-// 5. Github username
-const githubUsername = "pantha704"; // <- replace this
-// 6. Send TX to initialize account
+const Turbin3_wallet_json_1 = __importDefault(require("./Turbin3-wallet.json"));
+const system_1 = require("@coral-xyz/anchor/dist/cjs/native/system");
+const MPL_CORE_PROGRAM_ID = new web3_js_1.PublicKey("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d");
+// const kp = Keypair.fromSecretKey(new Uint8Array(wallet));   
+const kp = web3_js_1.Keypair.fromSecretKey(new Uint8Array(Turbin3_wallet_json_1.default));
+const connection = new web3_js_1.Connection('https://api.devnet.solana.com');
+const provider = new anchor_1.AnchorProvider(connection, new anchor_1.Wallet(kp), { commitment: "confirmed" });
+const program = new anchor_1.Program(Turbin3_prereq_1.IDL, provider);
+const account_seeds = [Buffer.from("prereqs"), kp.publicKey.toBuffer()];
+const [accounnt_key, _account_bump] = web3_js_1.PublicKey.findProgramAddressSync(account_seeds, program.programId);
+// NFT mint + constants
+const mintTs = web3_js_1.Keypair.generate();
+const mintCollection = new web3_js_1.PublicKey("5ebsp5RChCGK7ssRZMVMufgVZhd2kFbNaotcZ5UvytN2");
+const authority_seeds = [
+    Buffer.from("collection"),
+    mintCollection.toBuffer()
+];
+const [authority_key, _authority_bump] = web3_js_1.PublicKey.findProgramAddressSync(authority_seeds, program.programId);
+// INIT
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const tx = yield program.methods
-            .initialize(githubUsername)
-            .accounts({
-            user: keypair.publicKey,
-            account: accountKey,
-            systemProgram: web3_js_1.SystemProgram.programId,
+        const txHash = yield program.methods.initialize("panha704").accountsPartial({
+            user: kp.publicKey,
+            account: accounnt_key,
+            system_program: system_1.SYSTEM_PROGRAM_ID,
         })
-            .signers([keypair])
+            .signers([kp])
             .rpc();
-        console.log(`✅ Success! Check your TX: https://explorer.solana.com/tx/${tx}?cluster=devnet`);
+        console.log(`Success! Check out your TX here:
+        https://explorer.solana.com/tx/${txHash}?cluster=devnet`);
     }
-    catch (err) {
-        console.error("❌ Error initializing:", err);
+    catch (e) {
+        console.error(`Oops, something went wrong: ${e}`);
     }
 }))();
+// SUBMIT TS
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const txHash = yield program.methods
+            // @ts-ignore
+            .submitTs()
+            .accountsPartial({
+            user: kp.publicKey,
+            account: accounnt_key,
+            mint: mintTs.publicKey,
+            collection: mintCollection,
+            authority: authority_key,
+            mpl_core_program: MPL_CORE_PROGRAM_ID,
+            system_program: system_1.SYSTEM_PROGRAM_ID
+        })
+            .signers([kp, mintTs])
+            .rpc();
+        console.log(`Success! Check out your TX here:
+https://explorer.solana.com/tx/${txHash}?cluster=devnet`);
+    }
+    catch (e) {
+        console.error(`Oops, something went wrong: ${e}`);
+    }
+}));
