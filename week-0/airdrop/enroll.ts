@@ -17,7 +17,7 @@ const program: Program<Turbin3Prereq> = new Program(IDL, provider);
 
 const account_seeds = [Buffer.from("prereqs"), kp.publicKey.toBuffer()];
 
-const [accounnt_key, _account_bump] = PublicKey.findProgramAddressSync(account_seeds, program.programId)
+const [account_key, _account_bump] = PublicKey.findProgramAddressSync(account_seeds, program.programId)
 
 
 // NFT mint + constants
