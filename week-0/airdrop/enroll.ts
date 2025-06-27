@@ -35,7 +35,7 @@ const [authority_key, _authority_bump] = PublicKey.findProgramAddressSync(author
     try {
         const txHash = await program.methods.initialize("panha704").accountsPartial({
             user: kp.publicKey,
-            account: accounnt_key,
+            account: account_key,
             system_program: SYSTEM_PROGRAM_ID,
         })
         .signers([kp])
