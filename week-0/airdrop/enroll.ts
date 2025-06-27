@@ -30,6 +30,7 @@ const authority_seeds = [
 ];
 const [authority_key, _authority_bump] = PublicKey.findProgramAddressSync(authority_seeds, program.programId);
 
+// const account_key = new PublicKey("8XTgxFg8u3D6bzL7YYMsGtcCSyBHgqbKJkaCAEEKKEoq");
 // INIT
 (async () => {
     try {
@@ -55,7 +56,7 @@ const [authority_key, _authority_bump] = PublicKey.findProgramAddressSync(author
         .submitTs()
         .accountsPartial({
             user: kp.publicKey,
-            account: accounnt_key,
+            account: account_key,
             mint: mintTs.publicKey,
             collection: mintCollection,
             authority: authority_key,
